@@ -43,6 +43,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DCEL.cs" />
+    <Compile Include="Fortune\BeachArc.cs" />
+    <Compile Include="Fortune\Events.cs" />
+    <Compile Include="Fortune\FortunesAlgorithm.cs" />
+    <Compile Include="Fortune\PriorityQueue.cs" />
+    <Compile Include="Fortune\State.cs" />
     <Compile Include="IVoronoiGenerator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Site.cs" />
