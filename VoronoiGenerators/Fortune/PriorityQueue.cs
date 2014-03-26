@@ -53,8 +53,8 @@ namespace VoronoiGenerators.Fortune
 			if (firstEmptySlot == 0)
 				throw new InvalidOperationException("Cannot dequeue the top element from an empty PriorityQueue.");
 			T top = heap[0];
-			heap[0] = heap[firstEmptySlot];
-			heap[firstEmptySlot] = default(T);
+			heap[0] = heap[firstEmptySlot - 1];
+			heap[firstEmptySlot - 1] = default(T);
 			firstEmptySlot--;
 			WalkDown(0);
 			return top;
@@ -65,7 +65,10 @@ namespace VoronoiGenerators.Fortune
 			int currentSlot = startSlot,
 				parentSlot = ParentSlot(startSlot);
 			while (currentSlot > 0 && !ProperlyOrdered(parentSlot, currentSlot))
+			{ 
 				SwapElements(ref parentSlot, ref currentSlot);
+				parentSlot = ParentSlot(currentSlot);
+			}
 		}
 
 		private void WalkDown(int startSlot)
