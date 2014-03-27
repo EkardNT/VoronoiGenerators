@@ -44,7 +44,7 @@ namespace Tests.Fortune
 
 			for (int i = 0; i < tests.GetLength(0); i++)
 			{
-				Assert.Throws(typeof(ArgumentException), () => { Helpers.CircleCenter(tests[i, 0], tests[i, 1], tests[i, 2]); });
+				Assert.Throws(typeof(CollinearPointsException), () => { Helpers.CircleCenter(tests[i, 0], tests[i, 1], tests[i, 2]); });
 			}
 		}
 	}

@@ -42,8 +42,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Fortune\AreCollinearTests.cs" />
     <Compile Include="Fortune\CircleCenterTests.cs" />
     <Compile Include="Fortune\PriorityQueueTests.cs" />
+    <Compile Include="Fortune\TestBreakpointsConvergenceTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

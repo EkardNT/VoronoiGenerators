@@ -6,6 +6,8 @@ namespace VoronoiGenerators.Fortune
 	/// </summary>
 	internal static class Helpers
 	{
+		public const double Tolerance = 0.000001;
+
 		/// <summary>
 		/// Given three non-collinear points, finds the center of the
 		/// circle that passes through all three points.
@@ -39,7 +41,7 @@ namespace VoronoiGenerators.Fortune
 			var kDenominator = 2 * (a.X * (b.Y - c.Y) - a.Y * (b.X - c.X) + b.X * c.Y - b.Y * c.X);
 			var hDenominator = 2 * (a.X - b.X);
 			if (kDenominator == 0 || hDenominator == 0)
-				throw new ArgumentException("Collinear points.");
+				throw new CollinearPointsException(a, b, c);
 
 			var k = -(a.X * a.X * (b.X - c.X) - a.X * (b.X * b.X + b.Y * b.Y - c.X * c.X - c.Y * c.Y) + a.Y * a.Y * (b.X - c.X) + b.X * b.X * c.X - b.X * (c.X * c.X + c.Y * c.Y) + b.Y * b.Y * c.X) / kDenominator;
 			var h = -(2 * k * (a.Y - b.Y) - a.X * a.X - a.Y * a.Y + b.X * b.X + b.Y * b.Y) / hDenominator;
@@ -99,10 +101,10 @@ namespace VoronoiGenerators.Fortune
 				ra = 1.0 / (2.0 * (ry - sweepLineY)),
 				rb = 1.0 / (ry - sweepLineY),
 				rc = (rx * rx + ry * ry - sweepLineY * sweepLineY) / (2.0 * (ry - sweepLineY));
-			
+
 			// Solve for x coordinate first using quadratic equation.
 			// (la - ra) * x^2 + (lb - rb) * x + (lc - rc) = 0
-			double 
+			double
 				finalA = la - ra,
 				finalB = lb - rb,
 				finalC = lc - rc;
@@ -113,7 +115,7 @@ namespace VoronoiGenerators.Fortune
 			if (discriminant <= 0)
 				throw new ArgumentException("Discriminant was <= 0.");
 
-			double 
+			double
 				leftBreakpointX = (-finalB - Math.Sqrt(discriminant)) / (2.0 * finalA),
 				rightBreakpointX = (-finalB + Math.Sqrt(discriminant)) / (2.0 * finalA);
 
@@ -136,6 +138,67 @@ namespace VoronoiGenerators.Fortune
 			// choice of which breakpoint should be returned belongs to whichever
 			// algorithm is calling this method.
 			else return breakVerticalTiesLeft ? leftBreakpointX : rightBreakpointX;
+		}
+
+		/// <summary>
+		/// Determines whether the two breakpoints defined by three contiguous arcs
+		/// on the beach line converge.
+		/// </summary>
+		/// <param name="leftArcSitePosition">The position of the site that defines the left arc.</param>
+		/// <param name="middleArcSitePosition">The position of the site that defines the middle arc.</param>
+		/// <param name="rightArcSitePosition">The position of the site that defines the right arc.</param>
+		public static bool TestBreakpointsConvergence(Vector leftArcSitePosition, Vector middleArcSitePosition, Vector rightArcSitePosition)
+		{
+			if (AreCollinear(leftArcSitePosition, middleArcSitePosition, rightArcSitePosition))
+				return false;
+
+			// Compute parametric forms of the perpendicular bisectors, with
+			// the base points on the line between both pairs of sites and
+			// the positive positive directions of the lines pointing to the
+			// right.
+			Vector
+				basePoint1 = 0.5 * (leftArcSitePosition + middleArcSitePosition),
+				basePoint2 = 0.5 * (middleArcSitePosition + rightArcSitePosition);
+			Vector
+				direction1 = (middleArcSitePosition - leftArcSitePosition).Normalize().Perpendicular(),
+				direction2 = (rightArcSitePosition - middleArcSitePosition).Normalize().Perpendicular();
+			
+			// Sanity check that neither of the two direction vectors' magnitudes are zero.
+			if ((direction1.X == 0 && direction1.Y == 0) || (direction2.X == 0 && direction2.Y == 0))
+				throw new SanityCheckFailedException("Both of a direction vector's components were 0.");
+
+			// Check for perpendicularity
+			if(direction2.X * direction1.Y == direction2.Y * direction1.X)
+				return false;
+
+			if(direction1.X != 0)
+			{
+				double 
+					time2 = (direction1.X * (basePoint2.Y - basePoint1.Y) + direction1.Y * (basePoint1.X - basePoint2.X)) / (direction2.X * direction1.Y - direction2.Y * direction1.X),
+					time1 = (time2 * direction2.X + basePoint2.X - basePoint1.X) / direction1.X;
+				return time2 > 0 && time1 > 0;
+			}
+			else // direction1.Y != 0
+			{
+				double
+					time2 = (direction1.X * (basePoint1.Y - basePoint2.Y) + direction1.Y * (basePoint2.X - basePoint1.X)) / (direction2.Y * direction1.X - direction2.X * direction1.Y),
+					time1 = (time2 * direction1.Y + basePoint2.Y - basePoint1.Y) / direction1.Y;
+				return time2 > 0 && time1 > 0;
+			}
+		}
+
+		/// <summary>
+		/// Determines whether three points are collinear.
+		/// </summary>
+		/// <remarks>
+		/// Works by finding the area of the triangle enclosed by the
+		/// three points, and testing whether it is within some tolerance
+		/// to zero.
+		/// </remarks>
+		public static bool AreCollinear(Vector a, Vector b, Vector c)
+		{
+			var triangleArea = Math.Abs(0.5 * (a.X * (b.Y - c.Y) + b.X * (c.Y - a.Y) + c.X * (a.Y - b.Y)));
+			return triangleArea < Tolerance;
 		}
 	}
 }
