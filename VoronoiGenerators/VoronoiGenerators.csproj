@@ -45,6 +45,7 @@
     <Compile Include="DCEL.cs" />
     <Compile Include="Fortune\BeachArc.cs" />
     <Compile Include="Fortune\Events.cs" />
+    <Compile Include="Fortune\Exceptions.cs" />
     <Compile Include="Fortune\FortunesAlgorithm.cs" />
     <Compile Include="Fortune\PriorityQueue.cs" />
     <Compile Include="Fortune\State.cs" />
@@ -53,6 +54,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Site.cs" />
     <Compile Include="Vector.cs" />
+    <Compile Include="VoronoiException.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
