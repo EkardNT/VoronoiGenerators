@@ -22,5 +22,20 @@
 			X = x;
 			Y = y;
 		}
+
+		public override string ToString()
+		{
+			return string.Format("({0},{1})", X, Y);
+		}
+
+		public static bool operator==(Vector a, Vector b)
+		{
+			return a.X == b.X && a.Y == b.Y;
+		}
+
+		public static bool operator!=(Vector a, Vector b)
+		{
+			return a.X != b.X || a.Y != b.Y;
+		}
 	}
 }

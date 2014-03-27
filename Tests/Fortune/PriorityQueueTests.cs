@@ -2,7 +2,7 @@
 using System;
 using VoronoiGenerators.Fortune;
 
-namespace Tests
+namespace Tests.Fortune
 {
 	[TestFixture]
 	public class PriorityQueueTests
