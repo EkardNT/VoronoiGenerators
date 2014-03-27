@@ -4,7 +4,7 @@ namespace VoronoiGenerators.Fortune
 	/// <summary>
 	/// Contains utility method for various stages of Fortune's algorithm.
 	/// </summary>
-	public static class Helpers
+	internal static class Helpers
 	{
 		/// <summary>
 		/// Given three non-collinear points, finds the center of the
@@ -27,7 +27,7 @@ namespace VoronoiGenerators.Fortune
 		{
 			// a.X - b.X can't be 0, so if it currently is rotate
 			// the point definitions.
-			if(a.X - b.X == 0)
+			if (a.X - b.X == 0)
 			{
 				var temp = a;
 				a = b;
@@ -44,6 +44,98 @@ namespace VoronoiGenerators.Fortune
 			var k = -(a.X * a.X * (b.X - c.X) - a.X * (b.X * b.X + b.Y * b.Y - c.X * c.X - c.Y * c.Y) + a.Y * a.Y * (b.X - c.X) + b.X * b.X * c.X - b.X * (c.X * c.X + c.Y * c.Y) + b.Y * b.Y * c.X) / kDenominator;
 			var h = -(2 * k * (a.Y - b.Y) - a.X * a.X - a.Y * a.Y + b.X * b.X + b.Y * b.Y) / hDenominator;
 			return new Vector(h, k);
+		}
+
+		/// <summary>
+		/// Gets the x coordinate of the breakpoint between two adjacent arcs on the
+		/// beach line.
+		/// </summary>
+		/// <remarks>
+		/// It is important to note the difference between finding the breakpoints
+		/// between two sites versus between two arcs. Between any two sites there
+		/// will be exactly two breakpoints, which trace out (in opposite directions)
+		/// the Voronoi edge between the two sites. However, between adjacent arcs
+		/// on the beach line there is exactly one breakpoint. If this confuses you,
+		/// remember that if the parabola defined by a site is interrupted by one
+		/// or more other sites' parabolas, then the separated parts of the original
+		/// parabola are considered distinct arcs on the beach line, even though they
+		/// are caused by the same site.
+		/// 
+		/// Another important fact is that although the given left and right arcs
+		/// are indeed to the left and right of each other, respectively, there is
+		/// no need at all for the site that causes the left arc to be located to
+		/// the left of the site that causes the right arc. For a trivial example of
+		/// this, consider the case where both sites are located on the same x-coordinate.
+		/// </remarks>
+		public static double GetDividingBreakpointX(double sweepLineY, BeachArc leftArc, BeachArc rightArc, bool breakVerticalTiesLeft)
+		{
+			double
+				lx = leftArc.Site.Position.X,
+				ly = leftArc.Site.Position.Y,
+				rx = rightArc.Site.Position.X,
+				ry = rightArc.Site.Position.Y;
+
+			// Special case: if the two sites have the same y coordinate, 
+			// then both breakpoints are tracing out a vertical line
+			// perfectly centered between both sites (because Voronoi
+			// edges are perpendicular *bisectors*). We handle this
+			// case to avoid a division by 0 when we compute the 
+			// breakpoint X coordinates.
+			if (ly == ry)
+				return 0.5 * (lx + rx);
+
+			// The sweep line must be below both arcs' sites.
+			if (sweepLineY >= leftArc.Site.Position.Y
+				|| sweepLineY >= rightArc.Site.Position.Y)
+				throw new ArgumentException("Sweep line must be below both arcs' sites.");
+
+			// Equation of parabola for left arc is: y = la * x^2 + lb * x + lc
+			double
+				la = 1.0 / (2.0 * (ly - sweepLineY)),
+				lb = 1.0 / (ly - sweepLineY),
+				lc = (lx * lx + ly * ly - sweepLineY * sweepLineY) / (2.0 * (ly - sweepLineY));
+			// Equation of parabola for right arc is: y = ra * x^2 + rb * x + rc
+			double
+				ra = 1.0 / (2.0 * (ry - sweepLineY)),
+				rb = 1.0 / (ry - sweepLineY),
+				rc = (rx * rx + ry * ry - sweepLineY * sweepLineY) / (2.0 * (ry - sweepLineY));
+			
+			// Solve for x coordinate first using quadratic equation.
+			// (la - ra) * x^2 + (lb - rb) * x + (lc - rc) = 0
+			double 
+				finalA = la - ra,
+				finalB = lb - rb,
+				finalC = lc - rc;
+
+			// We always expect to find two real roots because there are two breakpoints
+			// between any two pairs of sites, so discriminant should be greater than 0.
+			double discriminant = finalB * finalB - 4.0 * finalA * finalC;
+			if (discriminant <= 0)
+				throw new ArgumentException("Discriminant was <= 0.");
+
+			double 
+				leftBreakpointX = (-finalB - Math.Sqrt(discriminant)) / (2.0 * finalA),
+				rightBreakpointX = (-finalB + Math.Sqrt(discriminant)) / (2.0 * finalA);
+
+			// Now we must decide which of the two roots to return. We say that the 
+			// arcs are 'normal' when the site that defines the left arc is to the
+			// left of the site that defines the right arc, and that the arcs are
+			// 'inverted' when left arc's site is actually to the right of the right
+			// arc's site.
+			//
+			// Our condition is: 
+			//		If the arcs are normal, return the right breakpoint. 
+			//		If the arcs are inverted, return the left.
+			if (lx < rx)
+				return rightBreakpointX;
+			else if (lx > rx)
+				return leftBreakpointX;
+			// There is an important special case to consider, however. If the sites'
+			// x coordinates are the same, then one of them is vertically above the
+			// other and the arcs are neither normal nor inverted. In this case, the
+			// choice of which breakpoint should be returned belongs to whichever
+			// algorithm is calling this method.
+			else return breakVerticalTiesLeft ? leftBreakpointX : rightBreakpointX;
 		}
 	}
 }

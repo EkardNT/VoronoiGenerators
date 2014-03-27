@@ -28,6 +28,16 @@
 			return string.Format("({0},{1})", X, Y);
 		}
 
+		public override bool Equals(object obj)
+		{
+			return obj is Vector && (Vector)obj == this;
+		}
+
+		public override int GetHashCode()
+		{
+			return X.GetHashCode() ^ Y.GetHashCode();
+		}
+
 		public static bool operator==(Vector a, Vector b)
 		{
 			return a.X == b.X && a.Y == b.Y;
