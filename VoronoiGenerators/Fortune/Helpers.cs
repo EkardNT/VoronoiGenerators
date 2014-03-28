@@ -176,14 +176,14 @@ namespace VoronoiGenerators.Fortune
 				double 
 					time2 = (direction1.X * (basePoint2.Y - basePoint1.Y) + direction1.Y * (basePoint1.X - basePoint2.X)) / (direction2.X * direction1.Y - direction2.Y * direction1.X),
 					time1 = (time2 * direction2.X + basePoint2.X - basePoint1.X) / direction1.X;
-				return time2 > 0 && time1 > 0;
+				return time2 >= 0 && time1 >= 0;
 			}
 			else // direction1.Y != 0
 			{
 				double
 					time2 = (direction1.X * (basePoint1.Y - basePoint2.Y) + direction1.Y * (basePoint2.X - basePoint1.X)) / (direction2.Y * direction1.X - direction2.X * direction1.Y),
 					time1 = (time2 * direction1.Y + basePoint2.Y - basePoint1.Y) / direction1.Y;
-				return time2 > 0 && time1 > 0;
+				return time2 >= 0 && time1 >= 0;
 			}
 		}
 

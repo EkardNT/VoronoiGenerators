@@ -14,9 +14,10 @@ namespace Tests.Fortune
 			{
 				{new Vector(0, 0), new Vector(1, 1), new Vector(2, 0)},
 				{new Vector(0, 0), new Vector(1, 1), new Vector(2, 1)},
-				{new Vector(0, 0), new Vector(0.5, 10), new Vector(1, 0)},				
-				{new Vector(0, 1), new Vector(1, 0), new Vector(2, 1)},
-				{new Vector(5, 9), new Vector(3, 1), new Vector(1, 0)}
+				{new Vector(0, 0), new Vector(0.5, 10), new Vector(1, 0)},
+				{new Vector(5, 9), new Vector(3, 1), new Vector(1, 0)},
+				{new Vector(1, 0), new Vector(0, 1), new Vector(2, 1)},
+				{new Vector(4, 7), new Vector(3, 2), new Vector(1, 1)}
 			};
 
 			for (int i = 0; i < tests.GetLength(0); i++)
@@ -35,7 +36,8 @@ namespace Tests.Fortune
 			{
 				{new Vector(-1, 0), new Vector(1, 0), new Vector(3, 0)},
 				{new Vector(1, 0), new Vector(3, 1), new Vector(5, 9)},
-				{new Vector(1, 1), new Vector(2,2), new Vector(3, 3)}
+				{new Vector(1, 1), new Vector(2, 2), new Vector(3, 3)},
+				{new Vector(1, 1), new Vector(3, 2), new Vector(4, 7)}
 			};
 
 			for (int i = 0; i < tests.GetLength(0); i++)
