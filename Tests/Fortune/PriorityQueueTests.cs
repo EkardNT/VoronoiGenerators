@@ -1,5 +1,6 @@
 ﻿using NUnit.Framework;
 using System;
+using System.Collections.Generic;
 using VoronoiGenerators.Fortune;
 
 namespace Tests.Fortune
@@ -12,14 +13,13 @@ namespace Tests.Fortune
 		[Test]
 		public void OrdersItemsCorrectly()
 		{
-			var pq = MakeMaxPQ();
-
 			const int Cases = 20, InputsPerCase = 10;
 			var rand = new Random(Seed);
 
 			var inputs = new byte[InputsPerCase];
 			for(int @case = 0; @case < Cases; @case++)
 			{
+				var pq = MakeMaxPQ();
 				rand.NextBytes(inputs);
 				foreach (var input in inputs)
 					pq.Enqueue(input);
@@ -33,13 +33,12 @@ namespace Tests.Fortune
 		[Test]
 		public void GivesSameNumberOfOutputsAsInputs()
 		{
-			var pq = MakeMaxPQ();
-
 			const int Cases = 20, MaxInputsPerCase = 20;
 			var rand = new Random(Seed);
 
 			for(int @case = 0; @case < Cases; @case++)
 			{
+				var pq = MakeMaxPQ();
 				int inputCount = rand.Next(1, MaxInputsPerCase);
 				for (int i = 0; i < inputCount; i++)
 					pq.Enqueue(rand.Next());
@@ -60,13 +59,12 @@ namespace Tests.Fortune
 		[Test]
 		public void CountIncrementsAndDecrementsCorrectly()
 		{
-			var pq = MakeMaxPQ();
-
 			const int Cases = 20, MaxInputsPerCase = 30;
 			var rand = new Random(Seed);
 
 			for(int @case = 0; @case < Cases; @case++)
 			{
+				var pq = MakeMaxPQ();
 				int inputCount = rand.Next(1, MaxInputsPerCase);
 				for(int i = 0; i < inputCount; i++)
 				{
@@ -84,18 +82,39 @@ namespace Tests.Fortune
 		[Test]
 		public void TopMatchesDequeuedElement()
 		{
-			var pq = MakeMaxPQ();
-
 			const int Cases = 20, MaxInputsPerCase = 30;
 			var rand = new Random(Seed);
 
 			for(int @case = 0; @case < Cases; @case++)
 			{
+				var pq = MakeMaxPQ();
 				int inputCount = rand.Next(1, MaxInputsPerCase);
 				for (int i = 0; i < inputCount; i++)
 					pq.Enqueue(rand.Next());
 				for (int i = 0; i < inputCount; i++)
 					Assert.That(pq.Top == pq.Dequeue(), Is.True);
+			}
+		}
+
+		[Test]
+		public void CorrectlyRemovesItems()
+		{
+			const int MaxCount = 20;
+			var rand = new Random(Seed);
+			var items = new List<PriorityQueueItem<int>>(MaxCount);
+
+			for(int count = 3; count < MaxCount; count++)
+			{
+				var pq = MakeMaxPQ();
+				for (int i = 0; i < count; i++)
+					items.Add(pq.Enqueue(rand.Next()));
+				// Invert the comparison to get descending order.
+				items.Sort((a, b) => b.Item - a.Item);
+				// Remove all the middle elements.
+				for (int i = 1; i < MaxCount - 1; i++)
+					pq.Remove(items[i]);
+				Assert.That(pq.Dequeue() == items[0].Item, Is.True);
+				Assert.That(pq.Dequeue() == items[MaxCount - 1].Item, Is.True);
 			}
 		}
 

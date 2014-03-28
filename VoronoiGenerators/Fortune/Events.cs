@@ -49,9 +49,9 @@
 		/// The arc which will disappear from the beach line
 		/// as a result of this CircleEvent.
 		/// </summary>
-		public BeachArc DisappearingArc { get; private set; }
+		public ArcNode DisappearingArc { get; private set; }
 
-		public CircleEvent(BeachArc disappearingArc, double lowestCircleY) : base(lowestCircleY)
+		public CircleEvent(ArcNode disappearingArc, double lowestCircleY) : base(lowestCircleY)
 		{
 			DisappearingArc = disappearingArc;
 		}

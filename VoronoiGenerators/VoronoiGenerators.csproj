@@ -43,7 +43,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DCEL.cs" />
-    <Compile Include="Fortune\BeachArc.cs" />
+    <Compile Include="Fortune\BeachNodes.cs" />
     <Compile Include="Fortune\Events.cs" />
     <Compile Include="Fortune\Exceptions.cs" />
     <Compile Include="Fortune\FortunesAlgorithm.cs" />

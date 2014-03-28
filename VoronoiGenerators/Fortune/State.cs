@@ -19,9 +19,10 @@ namespace VoronoiGenerators.Fortune
 		public PriorityQueue<Event> EventQueue;
 
 		/// <summary>
-		/// The leftmost arc on the beach line.
+		/// The root of the beach line status tree data structure.
+		/// An instance of either the BreakpointNode or ArcNode class.
 		/// </summary>
-		public BeachArc BeachLine;
+		public object BeachLine;
 
 		/// <summary>
 		/// The set of output faces.

@@ -3,16 +3,28 @@ using System.Collections.Generic;
 
 namespace VoronoiGenerators.Fortune
 {
+	internal class PriorityQueueItem<T>
+	{
+		public T Item { get; private set; }
+		public int Index { get; set; }
+
+		public PriorityQueueItem(T item, int index)
+		{
+			Item = item;
+			Index = index;
+		}
+	}
+
 	internal class PriorityQueue<T>
 	{
 		private Comparison<T> orderer;
-		private T[] heap;
+		private PriorityQueueItem<T>[] heap;
 		private int firstEmptySlot;
 
 		public PriorityQueue(Comparison<T> orderer)
 		{
 			this.orderer = orderer;
-			heap = new T[16];
+			heap = new PriorityQueueItem<T>[16];
 			firstEmptySlot = 0;
 		}
 
@@ -24,18 +36,19 @@ namespace VoronoiGenerators.Fortune
 			}
 		}
 
-		public void Enqueue(T item)
+		public PriorityQueueItem<T> Enqueue(T item)
 		{
 			if(firstEmptySlot >= heap.Length)
 			{
-				var newHeap = new T[Math.Max(16, heap.Length * 2)];
+				var newHeap = new PriorityQueueItem<T>[Math.Max(16, heap.Length * 2)];
 				for (int i = 0; i < heap.Length; i++)
 					newHeap[i] = heap[i];
 				heap = newHeap;
 			}
-			heap[firstEmptySlot] = item;
+			var pqItem = heap[firstEmptySlot] = new PriorityQueueItem<T>(item, firstEmptySlot);
 			firstEmptySlot++;
 			WalkUp(firstEmptySlot - 1);
+			return pqItem;
 		}
 
 		public T Top
@@ -44,7 +57,7 @@ namespace VoronoiGenerators.Fortune
 			{
 				if (firstEmptySlot == 0)
 					throw new InvalidOperationException("Cannot retrieve the top element from an empty PriorityQueue.");
-				return heap[0];
+				return heap[0].Item;
 			}
 		}
 
@@ -52,12 +65,25 @@ namespace VoronoiGenerators.Fortune
 		{
 			if (firstEmptySlot == 0)
 				throw new InvalidOperationException("Cannot dequeue the top element from an empty PriorityQueue.");
-			T top = heap[0];
+			var top = heap[0];
 			heap[0] = heap[firstEmptySlot - 1];
-			heap[firstEmptySlot - 1] = default(T);
+			heap[0].Index = 0;
+			heap[firstEmptySlot - 1] = null;
 			firstEmptySlot--;
 			WalkDown(0);
-			return top;
+			return top.Item;
+		}
+
+		public void Remove(PriorityQueueItem<T> item)
+		{
+			if (firstEmptySlot == 0)
+				throw new InvalidOperationException("Cannot remove an item from an empty PriorityQueue.");
+			heap[item.Index] = heap[firstEmptySlot - 1];
+			heap[item.Index].Index = item.Index;
+			heap[firstEmptySlot - 1] = null;
+			firstEmptySlot--;
+			WalkDown(item.Index);
+			WalkUp(item.Index);
 		}
 
 		private void WalkUp(int startSlot)
@@ -97,7 +123,9 @@ namespace VoronoiGenerators.Fortune
 
 		private void SwapElements(ref int slotA, ref int slotB)
 		{
-			T tempT = heap[slotA];
+			heap[slotA].Index = slotB;
+			heap[slotB].Index = slotA;
+			var tempT = heap[slotA];
 			heap[slotA] = heap[slotB];
 			heap[slotB] = tempT;
 			int temp = slotA;
@@ -107,7 +135,7 @@ namespace VoronoiGenerators.Fortune
 
 		private bool ProperlyOrdered(int higherSlot, int lowerSlot)
 		{
-			return orderer(heap[higherSlot], heap[lowerSlot]) >= 0;
+			return orderer(heap[higherSlot].Item, heap[lowerSlot].Item) >= 0;
 		}
 
 		private static int ParentSlot(int currentSlot)

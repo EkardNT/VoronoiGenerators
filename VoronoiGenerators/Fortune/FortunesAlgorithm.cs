@@ -57,7 +57,41 @@ namespace VoronoiGenerators.Fortune
 
 		private void HandleSiteEvent(SiteEvent ev, State state)
 		{
+			// If the beach line data structure is empty, initialize
+			// it with the arc created by the new site into it and return.
+			if (state.BeachLine == null)
+			{
+				state.BeachLine = new ArcNode(ev.Site);
+				return;
+			}
 
+			// Find the arc split by the new site.
+			ArcNode splitArcNode;
+			BreakpointNode parentNode;
+			FindArcSplitByNewSite(ev.Site.Position, state, out splitArcNode, out parentNode);
+
+			// If the arc being split has a circle event, it is a false alarm,
+			// so delete it from the event queue.
+		}
+
+		private void FindArcSplitByNewSite(Vector newSitePosition, State state, out ArcNode splitArcNode, out BreakpointNode parentNode)
+		{
+			parentNode = null;
+			var node = state.BeachLine;
+			BreakpointNode bpNode;
+			while((bpNode = node as BreakpointNode) != null)
+			{
+				var breakpointX = Helpers.GetBreakpointX(
+					state.SweepLineY, 
+					bpNode.LeftSite.Position, 
+					bpNode.RightSite.Position, 
+					bpNode.IsLeftBreakpoint);
+				parentNode = bpNode;
+				node = newSitePosition.X <= breakpointX
+					? bpNode.LeftChild
+					: bpNode.RightChild;
+			}
+			splitArcNode = (ArcNode)node;
 		}
 
 		private void HandleCircleEvent(CircleEvent ev, State state)
