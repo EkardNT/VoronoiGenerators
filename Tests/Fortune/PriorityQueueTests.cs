@@ -106,15 +106,20 @@ namespace Tests.Fortune
 			for(int count = 3; count < MaxCount; count++)
 			{
 				var pq = MakeMaxPQ();
+				items.Clear();
+
+				// Prepare
 				for (int i = 0; i < count; i++)
 					items.Add(pq.Enqueue(rand.Next()));
 				// Invert the comparison to get descending order.
 				items.Sort((a, b) => b.Item - a.Item);
 				// Remove all the middle elements.
-				for (int i = 1; i < MaxCount - 1; i++)
+				for (int i = 1; i < count - 1; i++)
 					pq.Remove(items[i]);
+
+				// Test
 				Assert.That(pq.Dequeue() == items[0].Item, Is.True);
-				Assert.That(pq.Dequeue() == items[MaxCount - 1].Item, Is.True);
+				Assert.That(pq.Dequeue() == items[count - 1].Item, Is.True);
 			}
 		}
 

@@ -88,6 +88,8 @@ namespace VoronoiGenerators.Fortune
 
 		private void WalkUp(int startSlot)
 		{
+			if (startSlot >= firstEmptySlot)
+				return;
 			int currentSlot = startSlot,
 				parentSlot = ParentSlot(startSlot);
 			while (currentSlot > 0 && !ProperlyOrdered(parentSlot, currentSlot))
@@ -109,7 +111,6 @@ namespace VoronoiGenerators.Fortune
 				leftChildSlot = LeftChildSlot(currentSlot);
 				rightChildSlot = RightChildSlot(currentSlot);
 			}
-			
 		}
 
 		private int FindBestLowerSwapSlot(int leftChildSlot, int rightChildSlot)
@@ -123,14 +124,14 @@ namespace VoronoiGenerators.Fortune
 
 		private void SwapElements(ref int slotA, ref int slotB)
 		{
-			heap[slotA].Index = slotB;
-			heap[slotB].Index = slotA;
 			var tempT = heap[slotA];
 			heap[slotA] = heap[slotB];
 			heap[slotB] = tempT;
 			int temp = slotA;
 			slotA = slotB;
 			slotB = temp;
+			heap[slotA].Index = slotA;
+			heap[slotB].Index = slotB;
 		}
 
 		private bool ProperlyOrdered(int higherSlot, int lowerSlot)
