@@ -27,7 +27,7 @@ namespace VoronoiGenerators.Fortune
 		/// <summary>
 		/// The set of output faces.
 		/// </summary>
-		public List<Face> Faces;
+		public Dictionary<Site, Face> Faces;
 
 		/// <summary>
 		/// The set of output Voronoi vertexes.

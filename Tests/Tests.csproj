@@ -39,6 +39,8 @@
   <ItemGroup>
     <Compile Include="Fortune\AreCollinearTests.cs" />
     <Compile Include="Fortune\CircleCenterTests.cs" />
+    <Compile Include="Fortune\FindArcSplitByNewSiteTests.cs" />
+    <Compile Include="Fortune\GetBreakpointXTests.cs" />
     <Compile Include="Fortune\PriorityQueueTests.cs" />
     <Compile Include="Fortune\TestBreakpointsConvergenceTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

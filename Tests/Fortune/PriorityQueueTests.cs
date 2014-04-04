@@ -115,7 +115,7 @@ namespace Tests.Fortune
 				items.Sort((a, b) => b.Item - a.Item);
 				// Remove all the middle elements.
 				for (int i = 1; i < count - 1; i++)
-					pq.Remove(items[i]);
+					pq.Remove(items[i].Index);
 
 				// Test
 				Assert.That(pq.Dequeue() == items[0].Item, Is.True);

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace VoronoiGenerators.Fortune
 {
@@ -74,16 +73,16 @@ namespace VoronoiGenerators.Fortune
 			return top.Item;
 		}
 
-		public void Remove(PriorityQueueItem<T> item)
+		public void Remove(int slot)
 		{
 			if (firstEmptySlot == 0)
 				throw new InvalidOperationException("Cannot remove an item from an empty PriorityQueue.");
-			heap[item.Index] = heap[firstEmptySlot - 1];
-			heap[item.Index].Index = item.Index;
+			heap[slot] = heap[firstEmptySlot - 1];
+			heap[slot].Index = slot;
 			heap[firstEmptySlot - 1] = null;
 			firstEmptySlot--;
-			WalkDown(item.Index);
-			WalkUp(item.Index);
+			WalkDown(slot);
+			WalkUp(slot);
 		}
 
 		private void WalkUp(int startSlot)

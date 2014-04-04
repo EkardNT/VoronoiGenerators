@@ -71,6 +71,11 @@ namespace VoronoiGenerators.Fortune
 				x2 = site2Position.X,
 				y2 = site2Position.Y;
 
+			// The sweep line must be below both arcs' sites.
+			if (sweepLineY >= site1Position.Y
+			    || sweepLineY >= site2Position.Y)
+				throw new ArgumentException("Sweep line must be below both arcs' sites.");
+
 			// Special case: if the two sites have the same y coordinate, 
 			// then both breakpoints are tracing out a vertical line
 			// perfectly centered between both sites (because Voronoi
@@ -80,21 +85,16 @@ namespace VoronoiGenerators.Fortune
 			if (y1 == y2)
 				return 0.5 * (x1 + x2);
 
-			// The sweep line must be below both arcs' sites.
-			if (sweepLineY >= site1Position.Y
-				|| sweepLineY >= site2Position.Y)
-				throw new ArgumentException("Sweep line must be below both arcs' sites.");
-
 			// Equation of parabola for first arc is: y = a1 * x^2 + b1 * x + c1
 			double
-				a1 = 1.0 / (2.0 * (y1 - sweepLineY)),
-				b1 = 1.0 / (y1 - sweepLineY),
-				c1 = (x1 * x1 + y1 * y1 - sweepLineY * sweepLineY) / (2.0 * (y1 - sweepLineY));
+				a1 = -1.0 / (2.0 * (sweepLineY - y1)),
+				b1 = x1 / (sweepLineY - y1),
+				c1 = (sweepLineY * sweepLineY - x1 * x1 - y1 * y1) / (2.0 * (sweepLineY - y1));
 			// Equation of parabola for right arc is: y = a2 * x^2 + b2 * x + c2
 			double
-				a2 = 1.0 / (2.0 * (y2 - sweepLineY)),
-				b2 = 1.0 / (y2 - sweepLineY),
-				c2 = (x2 * x2 + y2 * y2 - sweepLineY * sweepLineY) / (2.0 * (y2 - sweepLineY));
+				a2 = -1.0 / (2.0 * (sweepLineY - y2)),
+				b2 = x2 / (sweepLineY - y2),
+				c2 = (sweepLineY * sweepLineY - x2 * x2 - y2 * y2) / (2.0 * (sweepLineY - y2));
 
 			// Solve for x coordinate first using quadratic equation.
 			// (la - ra) * x^2 + (lb - rb) * x + (lc - rc) = 0
@@ -107,7 +107,12 @@ namespace VoronoiGenerators.Fortune
 			// between any two pairs of sites, so discriminant should be greater than 0.
 			double discriminant = finalB * finalB - 4.0 * finalA * finalC;
 			if (discriminant <= 0)
-				throw new ArgumentException("Discriminant was <= 0.");
+				throw new ArgumentException(string.Format(
+					"Discriminant was <= 0 ({0}) for site positions {1} and {2} with sweepline Y == {3}.",
+					discriminant,
+					site1Position,
+					site2Position,
+					sweepLineY));
 
 			return leftBreakpoint
 				? (-finalB - Math.Sqrt(discriminant)) / (2.0 * finalA)
@@ -173,6 +178,30 @@ namespace VoronoiGenerators.Fortune
 		{
 			var triangleArea = Math.Abs(0.5 * (a.X * (b.Y - c.Y) + b.X * (c.Y - a.Y) + c.X * (a.Y - b.Y)));
 			return triangleArea < Tolerance;
+		}
+
+		/// <summary>
+		/// Traverses the beach line status tree to find the leaf node 
+		/// representing the arc that it split by the site at the given position.
+		/// </summary>
+		public static ArcNode FindArcSplitByNewSite(Vector newSitePosition, object rootNode)
+		{
+			if (rootNode == null)
+				throw new ArgumentNullException("rootNode", "Root node cannot be null.");
+			var node = rootNode;
+			BreakpointNode bpNode;
+			while ((bpNode = node as BreakpointNode) != null)
+			{
+				var breakpointX = GetBreakpointX(
+					newSitePosition.Y,
+					bpNode.LeftSite.Position,
+					bpNode.RightSite.Position,
+					bpNode.IsLeftBreakpoint);
+				node = newSitePosition.X <= breakpointX
+					? bpNode.LeftChild
+					: bpNode.RightChild;
+			}
+			return (ArcNode)node;
 		}
 	}
 }

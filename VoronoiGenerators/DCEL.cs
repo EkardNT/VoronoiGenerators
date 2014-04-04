@@ -60,6 +60,11 @@ namespace VoronoiGenerators
 		/// that generated this Face.
 		/// </summary>
 		public object UserData { get; internal set; }
+
+		/// <summary>
+		/// One of the HalfEdges which borders and is oriented toward this Face.
+		/// </summary>
+		public HalfEdge BorderingEdge { get; internal set; }
 	}
 
 	/// <summary>

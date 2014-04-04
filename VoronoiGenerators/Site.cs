@@ -25,5 +25,13 @@
 			Position = position;
 			UserData = userData;
 		}
+
+		public override string ToString()
+		{
+			return string.Format(
+				"[Site Position={0} UserData={1}]",
+				Position,
+				UserData);
+		}
 	}
 }

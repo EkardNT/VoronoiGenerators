@@ -26,13 +26,27 @@
 		/// </summary>
 		public readonly bool IsLeftBreakpoint;
 
-		public object LeftChild, RightChild;
+		/// <summary>
+		/// Left child of this node in the beach line status tree data structure.
+		/// </summary>
+		public object LeftChild;
+
+		/// <summary>
+		/// Right child of this node in the beach line status tree data structure.
+		/// </summary>
+		public object RightChild;
+
+		/// <summary>
+		/// Parent of this node in the beach line status tree data structure.
+		/// </summary>
+		public BreakpointNode Parent;
 
 		public BreakpointNode(Site leftSite, Site rightSite, HalfEdge halfEdge, bool isLeftBreakpoint)
 		{
 			LeftSite = leftSite;
 			RightSite = rightSite;
 			HalfEdge = halfEdge;
+			IsLeftBreakpoint = isLeftBreakpoint;
 		}
 	}
 
@@ -52,11 +66,24 @@
 		/// arc on the beach line to disappear. Is null if no such event
 		/// has yet been detected.
 		/// </summary>
-		public CircleEvent DisappearingEvent;
+		public PriorityQueueItem<CircleEvent> DisappearanceEvent;
+
+		/// <summary>
+		/// Parent of this node in the beach line status tree data structure.
+		/// </summary>
+		public BreakpointNode Parent;
 
 		public ArcNode(Site definingSite)
 		{
 			DefiningSite = definingSite;
+		}
+
+		public override string ToString()
+		{
+			return string.Format(
+				"[ArcNode DefiningSite={0} DisappearanceEvent={1}]",
+				DefiningSite,
+				DisappearanceEvent == null ? null : DisappearanceEvent.Item);
 		}
 	}
 }
