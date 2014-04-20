@@ -4,7 +4,7 @@ namespace VoronoiGenerators.Fortune
 	/// <summary>
 	/// Contains utility method for various stages of Fortune's algorithm.
 	/// </summary>
-	internal static class Helpers
+	public static class Helpers
 	{
 		public const double Tolerance = 0.000001;
 
@@ -114,9 +114,12 @@ namespace VoronoiGenerators.Fortune
 					site2Position,
 					sweepLineY));
 
-			return leftBreakpoint
-				? (-finalB - Math.Sqrt(discriminant)) / (2.0 * finalA)
-				: (-finalB + Math.Sqrt(discriminant)) / (2.0 * finalA);
+			double 
+				left = (-finalB - Math.Sqrt(discriminant)) / (2.0 * finalA),
+				right = (-finalB + Math.Sqrt(discriminant)) / (2.0 * finalA);
+			if (leftBreakpoint)
+				return left <= right ? left : right;
+			return left <= right ? right : left;
 		}
 
 		/// <summary>
@@ -184,7 +187,7 @@ namespace VoronoiGenerators.Fortune
 		/// Traverses the beach line status tree to find the leaf node 
 		/// representing the arc that it split by the site at the given position.
 		/// </summary>
-		public static ArcNode FindArcSplitByNewSite(Vector newSitePosition, object rootNode)
+		internal static ArcNode FindArcSplitByNewSite(Vector newSitePosition, object rootNode)
 		{
 			if (rootNode == null)
 				throw new ArgumentNullException("rootNode", "Root node cannot be null.");

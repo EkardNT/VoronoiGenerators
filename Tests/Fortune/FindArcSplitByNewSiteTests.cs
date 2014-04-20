@@ -59,6 +59,7 @@ namespace Tests.Fortune
 			}
 			// Three arc tree with sites vertically aligned.
 			{
+				// Breakpoints are at +- 7.01...
 				var leftArc = new ArcNode(new Site(new Vector(0, 10)));
 				var middleArc = new ArcNode(new Site(new Vector(0, 5)));
 				var rightArc = new ArcNode(leftArc.DefiningSite);
